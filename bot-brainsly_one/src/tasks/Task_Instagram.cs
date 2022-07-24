@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Quartz;
 using bot_brainsly_one.src.actions.instagram;
 
 namespace bot_brainsly_one.src.tasks
 {
-    public class Task_Instagram: IJob
+    [DisallowConcurrentExecution]
+    public class Task_Instagram : IJob
     {
-        public async Task Execute(IJobExecutionContext context)
+        public Task Execute(IJobExecutionContext context)
         {
-            await new Instagram_Action().MakeInstagramAction();
+            if (Program.isLogged)
+            {
+                new Instagram_Action(Program.foxDriver).MakeInstagramAction();
+            }
+            return Task.CompletedTask;
         }
     }
 }
