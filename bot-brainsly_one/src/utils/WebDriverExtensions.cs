@@ -9,13 +9,11 @@ namespace bot_brainsly_one.src.utils
             try
             {
                 element = driver.FindElement(by);
-
                 return true;
             }
             catch (NoSuchElementException)
             {
                 element = null;
-
                 return false;
             }
         }

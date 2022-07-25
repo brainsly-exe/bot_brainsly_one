@@ -15,9 +15,17 @@ namespace bot_brainsly_one
         public static IWebDriver foxDriver;
         public static bool isLogged = false;
 
+        public static int totalActionsFinishedInstagram = 0;
+        public static int totalActionsLikeFinishedInstagram = 0;
+        public static int totalActionsFollowFinishedInstagram = 0;
+
         private static async Task Main(string[] args)
         {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("---------------|   Iniciado o BOT BRAINSLT_ONE   |--------------------");
+            Console.WriteLine("\n\n\n");
+            Console.ForegroundColor = ConsoleColor.White;
+
             Program.MakeLogins();
 
             await new Execute_Bot().ExecuteBot();
@@ -28,8 +36,13 @@ namespace bot_brainsly_one
             Program.foxDriver = new FirefoxDriver();
             if (Program.loginInstagram())
             {
+                Console.WriteLine("\n\n\n");
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.WriteLine("Efetuado Login no Instagram com sucesso as " + DateTime.Now);
                 if(Program.loginGanharNoInsta())
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.WriteLine("Efetuado Login no GanharNoInsta com sucesso as " + DateTime.Now + "\n\n");
                     Program.isLogged = true;
                 }
             }

@@ -47,10 +47,13 @@ namespace bot_brainsly_one.src.actions.instagram
 
                             buttonAccessAction.Click();
 
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            Console.WriteLine("Tarefa de " + type + " recebida as " + DateTime.Now + "\n\n");
+
                             if (type == "follow") action = this.followUser();
                             else if (type == "like") action = this.likePost();
 
-                            if (action) return this.confirmAction();
+                            if (action) return this.confirmAction(type);
                         }
                     }
                 }
@@ -125,26 +128,55 @@ namespace bot_brainsly_one.src.actions.instagram
             }
         }
 
-        private bool confirmAction()
+        private bool confirmAction(string actionType)
         {
             try
             {
                 Thread.Sleep(5000);
                 this.foxDriver.SwitchTo().Window(this.foxDriver.WindowHandles.First());
-                IWebElement buttonConfirm = this.foxDriver.FindElement(By.XPath("//*[@id='btn-confirmar']"));
-                buttonConfirm.Click();
-                Thread.Sleep(4000);
 
-                return true;
+                IWebElement buttonConfirm = null;
+                if (this.foxDriver.TryFindElement(By.XPath("//*[@id='btn-confirmar']"), out buttonConfirm))
+                {
+                    buttonConfirm.Click();
+                    Thread.Sleep(4000);
+
+                    this.LogInfosInstagram(actionType);
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+
             }
-            catch (NoSuchElementException error) 
+            catch (NoSuchElementException) 
             {
-                throw error;
+                return false;
             }
-            catch (Exception error)
+            catch (Exception)
             {
-                throw error;
+                return false;
             }
+        }
+
+        private void LogInfosInstagram(string actionType)
+        {
+            if (actionType == "follow") Program.totalActionsFollowFinishedInstagram += 1;
+            else Program.totalActionsLikeFinishedInstagram += 1;
+            Program.totalActionsFinishedInstagram += 1;
+
+            Console.WriteLine("\n\n");
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.Out.WriteLine("Tarefa finalizada com sucesso as: " + DateTime.Now);
+            Console.WriteLine("\n");
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+            Console.Out.WriteLine("Tarefas de Like realizadas: " + Program.totalActionsLikeFinishedInstagram);
+            Console.Out.WriteLine("Tarefas de Follow realizadas: " + Program.totalActionsFollowFinishedInstagram);
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Out.WriteLine("Total de tarefas realizadas nesse processo: " + Program.totalActionsFinishedInstagram);
         }
     }
 }
