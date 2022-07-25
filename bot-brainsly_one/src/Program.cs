@@ -38,11 +38,11 @@ namespace bot_brainsly_one
             {
                 Console.WriteLine("\n\n\n");
                 Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine("Efetuado Login no Instagram com sucesso as " + DateTime.Now);
+                Console.WriteLine("Efetuado Login no Instagram com sucesso em " + DateTime.Now);
                 if(Program.loginGanharNoInsta())
                 {
                     Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    Console.WriteLine("Efetuado Login no GanharNoInsta com sucesso as " + DateTime.Now + "\n\n");
+                    Console.WriteLine("Efetuado Login no GanharNoInsta com sucesso em " + DateTime.Now + "\n\n");
                     Program.isLogged = true;
                 }
             }

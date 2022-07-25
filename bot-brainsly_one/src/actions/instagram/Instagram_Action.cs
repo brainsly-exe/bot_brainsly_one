@@ -48,7 +48,7 @@ namespace bot_brainsly_one.src.actions.instagram
                             buttonAccessAction.Click();
 
                             Console.ForegroundColor = ConsoleColor.Gray;
-                            Console.WriteLine("Tarefa de " + type + " recebida as " + DateTime.Now + "\n\n");
+                            Console.WriteLine("Tarefa de " + type + " recebida em " + DateTime.Now + "\n\n");
 
                             if (type == "follow") action = this.followUser();
                             else if (type == "like") action = this.likePost();
@@ -170,7 +170,7 @@ namespace bot_brainsly_one.src.actions.instagram
 
             Console.WriteLine("\n\n");
             Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Out.WriteLine("Tarefa finalizada com sucesso as: " + DateTime.Now);
+            Console.Out.WriteLine("Tarefa finalizada com sucesso em: " + DateTime.Now);
             Console.WriteLine("\n");
             Console.ForegroundColor = ConsoleColor.DarkCyan;
             Console.Out.WriteLine("Tarefas de Like realizadas: " + Program.totalActionsLikeFinishedInstagram);
