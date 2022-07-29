@@ -18,7 +18,16 @@ namespace bot_brainsly_one.src.actions.instagram
         {
             try
             {
-                Thread.Sleep(3000);
+                Thread.Sleep(500);
+                IWebElement buttonReStartSearchActions = null;
+                if (this.foxDriver.TryFindElement(By.XPath("//*[@id='btn_iniciar']"), out buttonReStartSearchActions) && buttonReStartSearchActions?.Displayed == true)
+                {
+                    buttonReStartSearchActions.Click();
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.Out.WriteLine("Ocorreu um erro, sistema reiniciado em: " + DateTime.Now + "\n");
+                    return false;
+                }
+
                 IWebElement buttonSearchActions = null;
                 if (this.foxDriver.TryFindElement(By.XPath("//*[@id='refresh']"), out buttonSearchActions))
                 {
@@ -27,45 +36,74 @@ namespace bot_brainsly_one.src.actions.instagram
 
                 bool action = false;
                 Thread.Sleep(3000);
-                IWebElement headerWithoutTask = null;
-                if (this.foxDriver.TryFindElement(By.XPath("/html/body/div[1]/div/div/div/div/div[5]/div/div/div[1]/h3"), out headerWithoutTask))
+                IWebElement bodyTag = null;
+                if (this.foxDriver.TryFindElement(By.TagName("body"), out bodyTag))
                 {
-                    if (headerWithoutTask?.Text == "Tarefas Esgotadas")
+                    IWebElement buttonAccessAction = null;
+
+                    IWebElement buttonStopSearchActions = null;
+                    if
+                        (
+                            (this.foxDriver.TryFindElement(By.XPath("//*[@id='btn_pausar']"), out buttonStopSearchActions) && buttonStopSearchActions?.Displayed == true) &&
+                            buttonSearchActions == null &&
+                            bodyTag?.Text.Contains("Tarefas Esgotadas") == true
+                        )
+                    {
+                        this.foxDriver.Navigate().Refresh();
+                        Console.Out.WriteLine("Ocorreu um erro, sistema reiniciado em: " + DateTime.Now + "\n");
+                        return false;
+                    }
+
+                    IWebElement buttonActionsScreen = null;
+                    if(!this.foxDriver.TryFindElement(By.XPath("//a//b//span[.='Realizar Ações']"), out buttonActionsScreen))
+                    {
+                        this.foxDriver.Navigate().Refresh();
+                        return false;
+                    }
+
+
+                    if (bodyTag?.Text.Contains("Tarefas Esgotadas") == true)
                     {
                         return false;
                     }
-                }
-                else
-                {
-                    IWebElement infoActionType = null;
-                    if (this.foxDriver.TryFindElement(By.XPath("/html/body/div[1]/div/div/div/div/div[5]/center/div/div/div[1]/b"), out infoActionType))
+                    else if(this.foxDriver.TryFindElement(By.XPath("//*[@id='btn-acessar']"), out buttonAccessAction))
                     {
-                        IWebElement buttonAccessAction = null;
-                        if (this.foxDriver.TryFindElement(By.XPath("//*[@id='btn-acessar']"), out buttonAccessAction))
+                        string type = string.Empty;
+
+                        if(bodyTag?.Text.Contains("Seguir Perfil") == true)
                         {
-                            string type = infoActionType?.Text.Contains("Seguir Perfil") == true ? "follow" : "like";
-
-                            buttonAccessAction.Click();
-
-                            Console.ForegroundColor = ConsoleColor.Gray;
-                            Console.WriteLine("Tarefa de " + type + " recebida em " + DateTime.Now + "\n\n");
-
-                            if (type == "follow") action = this.followUser();
-                            else if (type == "like") action = this.likePost();
-
-                            if (action) return this.confirmAction(type);
+                            type = "follow";
                         }
+                        else if(bodyTag?.Text.Contains("Curtir Publicação") == true)
+                        {
+                            type = "like";
+                        }
+                        else
+                        {
+                            return false;
+                        }
+
+                        buttonAccessAction.Click();
+
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.WriteLine("Tarefa de " + type + " recebida em " + DateTime.Now);
+
+                        if (type == "follow") action = this.followUser();
+                        else if (type == "like") action = this.likePost();
+
+                        if (action) return this.confirmAction(type);
+
                     }
                 }
+
                 return false;
             }
-            catch (NoSuchElementException){ }
-            catch (Exception error)
+            catch (Exception)
             {
-                throw error;
+                this.foxDriver.Navigate().Refresh();
+                Console.Out.WriteLine("Ocorreu um erro, sistema reiniciado em: " + DateTime.Now + "\n");
+                return false;
             }
-
-            return false;
         }
 
         private bool likePost()
@@ -76,7 +114,7 @@ namespace bot_brainsly_one.src.actions.instagram
                 this.foxDriver.SwitchTo().Window(this.foxDriver.WindowHandles.Last());
 
                 IWebElement buttonLike = null;
-                if (this.foxDriver.TryFindElement(By.XPath("/html/body/div[1]/div/div/div/div[1]/div/div/div/div[1]/div[1]/section/main/div[1]/div[1]/article/div/div[2]/div/div[2]/section[1]/span[1]/button"), out buttonLike))
+                if (this.foxDriver.TryFindElement(By.XPath("//*[@aria-label='Curtir'][name()='svg']/parent::div/parent::button"), out buttonLike))
                 {
                     buttonLike.Click();
                     Thread.Sleep(8000);
@@ -86,10 +124,6 @@ namespace bot_brainsly_one.src.actions.instagram
 
                 Thread.Sleep(8000);
                 this.foxDriver.Close();
-                return false;
-            }
-            catch (NoSuchElementException)
-            {
                 return false;
             }
             catch (Exception)
@@ -106,7 +140,7 @@ namespace bot_brainsly_one.src.actions.instagram
                 this.foxDriver.SwitchTo().Window(this.foxDriver.WindowHandles.Last());
 
                 IWebElement buttonFollow = null;
-                if (this.foxDriver.TryFindElement(By.XPath("/html/body/div[1]/div/div/div/div[1]/div/div/div/div[1]/div[1]/section/main/div/header/section/div[1]/div[1]/div/div[2]/button"), out buttonFollow))
+                if (this.foxDriver.TryFindElement(By.XPath("//button[.='Seguir']"), out buttonFollow))
                 {
                     buttonFollow.Click();
                     Thread.Sleep(8000);
@@ -116,10 +150,6 @@ namespace bot_brainsly_one.src.actions.instagram
 
                 Thread.Sleep(8000);
                 this.foxDriver.Close();
-                return false;
-            }
-            catch (NoSuchElementException)
-            {
                 return false;
             }
             catch (Exception)
@@ -149,12 +179,6 @@ namespace bot_brainsly_one.src.actions.instagram
                 {
                     return false;
                 }
-
-
-            }
-            catch (NoSuchElementException) 
-            {
-                return false;
             }
             catch (Exception)
             {
@@ -164,11 +188,17 @@ namespace bot_brainsly_one.src.actions.instagram
 
         private void LogInfosInstagram(string actionType)
         {
-            if (actionType == "follow") Program.totalActionsFollowFinishedInstagram += 1;
-            else Program.totalActionsLikeFinishedInstagram += 1;
+            if (actionType == "follow")
+            {
+                Program.totalActionsFollowFinishedInstagram += 1;
+            }
+            else
+            {
+                Program.totalActionsLikeFinishedInstagram += 1;
+            }
+
             Program.totalActionsFinishedInstagram += 1;
 
-            Console.WriteLine("\n\n");
             Console.ForegroundColor = ConsoleColor.Gray;
             Console.Out.WriteLine("Tarefa finalizada com sucesso em: " + DateTime.Now);
             Console.WriteLine("\n");
@@ -177,6 +207,7 @@ namespace bot_brainsly_one.src.actions.instagram
             Console.Out.WriteLine("Tarefas de Follow realizadas: " + Program.totalActionsFollowFinishedInstagram);
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Out.WriteLine("Total de tarefas realizadas nesse processo: " + Program.totalActionsFinishedInstagram);
+            Console.WriteLine("\n\n");
         }
     }
 }
