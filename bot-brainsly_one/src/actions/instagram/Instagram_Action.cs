@@ -3,175 +3,200 @@ using OpenQA.Selenium;
 using System.Threading;
 using bot_brainsly_one.src.utils;
 using System.Linq;
+using OpenQA.Selenium.Support.UI;
 
 namespace bot_brainsly_one.src.actions.instagram
 {
-    public class Instagram_Action
+    public class Actions
     {
-        private IWebDriver foxDriver;
-
-        public Instagram_Action(IWebDriver driver)
-        {
-            this.foxDriver = driver;
-        }
-        public bool MakeInstagramAction()
+        public void MakeActions(IWebDriver driver)
         {
             try
             {
-                Thread.Sleep(500);
-                IWebElement buttonReStartSearchActions = null;
-                if (this.foxDriver.TryFindElement(By.XPath("//*[@id='btn_iniciar']"), out buttonReStartSearchActions) && buttonReStartSearchActions?.Displayed == true)
+                var StopTime = DateTime.Now.AddHours(3);
+                do
                 {
-                    buttonReStartSearchActions.Click();
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.Out.WriteLine("Ocorreu um erro, sistema reiniciado em: " + DateTime.Now + "\n");
-                    return false;
-                }
+                    Thread.Sleep(2000);
 
-                IWebElement buttonSearchActions = null;
-                if (this.foxDriver.TryFindElement(By.XPath("//*[@id='refresh']"), out buttonSearchActions))
-                {
-                    buttonSearchActions.Click();
-                }
+                    bool action = false;
 
-                bool action = false;
-                Thread.Sleep(3000);
-                IWebElement bodyTag = null;
-                if (this.foxDriver.TryFindElement(By.TagName("body"), out bodyTag))
-                {
-                    IWebElement buttonAccessAction = null;
-
-                    IWebElement buttonStopSearchActions = null;
-                    if
-                        (
-                            (this.foxDriver.TryFindElement(By.XPath("//*[@id='btn_pausar']"), out buttonStopSearchActions) && buttonStopSearchActions?.Displayed == true) &&
-                            buttonSearchActions == null &&
-                            bodyTag?.Text.Contains("Tarefas Esgotadas") == true
-                        )
+                    IWebElement bodyTag = null;
+                    if (driver.TryFindElement(By.TagName("body"), out bodyTag))
                     {
-                        this.foxDriver.Navigate().Refresh();
-                        Console.Out.WriteLine("Ocorreu um erro, sistema reiniciado em: " + DateTime.Now + "\n");
-                        return false;
-                    }
+                        IWebElement warningLoading = null;
+                        IWebElement warningMaintenance = null;
+                        IWebElement buttonReStartSearchActions = null;
+                        IWebElement buttonSearchActions = null;
+                        IWebElement buttonAccessAction = null;
+                        IWebElement buttonStopSearchActions = null;
+                        IWebElement buttonActionsScreen = null;
 
-                    IWebElement buttonActionsScreen = null;
-                    if(!this.foxDriver.TryFindElement(By.XPath("//a//b//span[.='Realizar Ações']"), out buttonActionsScreen))
-                    {
-                        this.foxDriver.Navigate().Refresh();
-                        return false;
-                    }
-
-
-                    if (bodyTag?.Text.Contains("Tarefas Esgotadas") == true)
-                    {
-                        return false;
-                    }
-                    else if(this.foxDriver.TryFindElement(By.XPath("//*[@id='btn-acessar']"), out buttonAccessAction))
-                    {
-                        string type = string.Empty;
-
-                        if(bodyTag?.Text.Contains("Seguir Perfil") == true)
+                        IWebElement selectAccount = null;
+                        if (driver.TryFindElement(By.XPath("//*[@id='contaig']"), out selectAccount))
                         {
-                            type = "follow";
+                            SelectElement selectElement = new SelectElement(selectAccount);
+                            selectElement.SelectByText($"brainsly_{Program.accountInstagram}");
+                            Thread.Sleep(2000);
                         }
-                        else if(bodyTag?.Text.Contains("Curtir Publicação") == true)
+
+                        if (driver.TryFindElement(By.XPath("//b[.='Estamos carregando o sistema, aguarde alguns segundos...']"), out warningLoading) && warningLoading?.Displayed == true)
                         {
-                            type = "like";
+                            continue;
+                        }
+                        else if (driver.TryFindElement(By.XPath("//*[@id='refresh']"), out buttonSearchActions) && buttonSearchActions?.Displayed == true)
+                        {
+                            buttonSearchActions.Click();
+                            continue;
+                        }
+                        else if (!driver.TryFindElement(By.XPath("//a//b//span[.='Realizar Ações']"), out buttonActionsScreen))
+                        {
+                            driver.Navigate().Refresh();
+                            continue;
+                        }
+                        else if (driver.TryFindElement(By.XPath("//h1[.='Manutenção Temporária']"), out warningMaintenance))
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkYellow;
+                            Console.Out.WriteLine("Manutenção Temporária detectada em: " + DateTime.Now + "\n");
+                            Console.Out.WriteLine("Suspendendo processo por 5 minutos...");
+                            Thread.Sleep(300000);
+                            Console.Out.WriteLine("Tentando novamente contatar a plataforma...");
+                            driver.Navigate().Refresh();
+                            continue;
+                        }
+                        else if (driver.TryFindElement(By.XPath("//*[@id='btn_iniciar']"), out buttonReStartSearchActions) && buttonReStartSearchActions?.Displayed == true)
+                        {
+                            buttonReStartSearchActions.Click();
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            Console.Out.WriteLine("Ocorreu um erro, sistema reiniciado em: " + DateTime.Now + "\n");
+                            continue;
                         }
                         else
                         {
-                            return false;
+                            if ((driver.TryFindElement(By.XPath("//*[@id='btn_pausar']"), out buttonStopSearchActions) &&
+                                buttonStopSearchActions?.Displayed == true) &&
+                                bodyTag?.Text.Contains("Tarefas Esgotadas") == true)
+                            {
+                                driver.Navigate().Refresh();
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
+                                Console.Out.WriteLine("Ocorreu um erro, sistema reiniciado em: " + DateTime.Now + "\n");
+                                continue;
+                            }
                         }
 
-                        buttonAccessAction.Click();
+                        if (bodyTag?.Text.Contains("Tarefas Esgotadas") == true)
+                        {
+                            continue;
+                        }
+                        else if (driver.TryFindElement(By.XPath("//*[@id='btn-acessar']"), out buttonAccessAction))
+                        {
+                            string type = string.Empty;
 
-                        Console.ForegroundColor = ConsoleColor.Gray;
-                        Console.WriteLine("Tarefa de " + type + " recebida em " + DateTime.Now);
+                            if (bodyTag?.Text.Contains("Seguir Perfil") == true)
+                            {
+                                type = "follow";
+                            }
+                            else if (bodyTag?.Text.Contains("Curtir Publicação") == true)
+                            {
+                                type = "like";
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.Out.WriteLine("Novo caso de tarefa detectado: \n\n");
+                                Console.Out.WriteLine(bodyTag.Text);
+                                Console.Out.WriteLine("\n\n");
+                                continue;
+                            }
 
-                        if (type == "follow") action = this.followUser();
-                        else if (type == "like") action = this.likePost();
+                            buttonAccessAction.Click();
+                            Thread.Sleep(5000);
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            Console.WriteLine("Tarefa de " + type + " recebida em " + DateTime.Now);
 
-                        if (action) return this.confirmAction(type);
+                            driver.SwitchTo().Window(driver.WindowHandles.Last());
+                            Thread.Sleep(9000);
 
+                            if (type == "follow") action = this.followUser(driver);
+                            else if (type == "like") action = this.likePost(driver);
+
+                            if (action) this.confirmAction(driver, type);
+                        }
                     }
-                }
-
-                return false;
+                } while (DateTime.Now <= StopTime);
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                this.foxDriver.Navigate().Refresh();
-                Console.Out.WriteLine("Ocorreu um erro, sistema reiniciado em: " + DateTime.Now + "\n");
-                return false;
+                Console.Out.WriteLine(error.Message);
             }
         }
 
-        private bool likePost()
+        private bool likePost(IWebDriver driver)
         {
             try
             {
-                Thread.Sleep(11000);
-                this.foxDriver.SwitchTo().Window(this.foxDriver.WindowHandles.Last());
-
                 IWebElement buttonLike = null;
-                if (this.foxDriver.TryFindElement(By.XPath("//*[@aria-label='Curtir'][name()='svg']/parent::div/parent::button"), out buttonLike))
+                if (driver.TryFindElement(By.XPath("//*[@aria-label='Curtir'][name()='svg']/parent::div/parent::button"), out buttonLike))
                 {
                     buttonLike.Click();
                     Thread.Sleep(8000);
-                    this.foxDriver.Close();
+                    driver.Close();
                     return true;
                 }
+                else
+                {
+                    Thread.Sleep(8000);
+                    driver.Close();
+                    return false;
+                }
 
-                Thread.Sleep(8000);
-                this.foxDriver.Close();
-                return false;
             }
-            catch (Exception)
+            catch (Exception error)
             {
+                Console.Out.WriteLine(error.Message);
                 return false;
             }
         }
 
-        private bool followUser()
+        private bool followUser(IWebDriver driver)
         {
             try
             {
-                Thread.Sleep(11000);
-                this.foxDriver.SwitchTo().Window(this.foxDriver.WindowHandles.Last());
-
                 IWebElement buttonFollow = null;
-                if (this.foxDriver.TryFindElement(By.XPath("//button[.='Seguir']"), out buttonFollow))
+                if (driver.TryFindElement(By.XPath("//button[.='Seguir']"), out buttonFollow))
                 {
                     buttonFollow.Click();
                     Thread.Sleep(8000);
-                    this.foxDriver.Close();
+                    driver.Close();
                     return true;
                 }
-
-                Thread.Sleep(8000);
-                this.foxDriver.Close();
-                return false;
+                else
+                {
+                    Thread.Sleep(8000);
+                    driver.Close();
+                    return false;
+                }
             }
-            catch (Exception)
+            catch (Exception error)
             {
+                Console.Out.WriteLine(error.Message);
                 return false;
             }
         }
-
-        private bool confirmAction(string actionType)
+        
+        private bool confirmAction(IWebDriver driver, string actionType)
         {
             try
             {
                 Thread.Sleep(5000);
-                this.foxDriver.SwitchTo().Window(this.foxDriver.WindowHandles.First());
+                driver.SwitchTo().Window(driver.WindowHandles.First());
+                Thread.Sleep(3000);
 
                 IWebElement buttonConfirm = null;
-                if (this.foxDriver.TryFindElement(By.XPath("//*[@id='btn-confirmar']"), out buttonConfirm))
+                if (driver.TryFindElement(By.XPath("//*[@id='btn-confirmar']"), out buttonConfirm))
                 {
                     buttonConfirm.Click();
                     Thread.Sleep(4000);
-
-                    this.LogInfosInstagram(actionType);
+                    this.LogInfos(actionType);
 
                     return true;
                 }
@@ -180,34 +205,39 @@ namespace bot_brainsly_one.src.actions.instagram
                     return false;
                 }
             }
-            catch (Exception)
+            catch (Exception error)
             {
+                Console.Out.WriteLine(error.Message);
                 return false;
             }
         }
 
-        private void LogInfosInstagram(string actionType)
+        private void LogInfos(string actionType)
         {
-            if (actionType == "follow")
+            try
             {
-                Program.totalActionsFollowFinishedInstagram += 1;
+                if (actionType == "follow") Program.totalActionsFollowFinished += 1;
+                else Program.totalActionsLikeFinished += 1;
+
+                Program.totalActionsFinished += 1;
+
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Out.WriteLine("Tarefa finalizada com sucesso em: " + DateTime.Now);
+                Console.WriteLine("\n");
+
+                Console.Out.WriteLine("Resumo de Tarefas");
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Out.WriteLine("Tarefas de Like realizadas: " + Program.totalActionsLikeFinished);
+                Console.Out.WriteLine("Tarefas de Follow realizadas: " + Program.totalActionsFollowFinished);
+                Console.WriteLine("\n");
+
+                Console.Out.WriteLine("Total de tarefas realizadas nesse processo: " + Program.totalActionsFinished);
+                Console.WriteLine("\n\n");
             }
-            else
+            catch (Exception error)
             {
-                Program.totalActionsLikeFinishedInstagram += 1;
+                Console.Out.WriteLine(error.Message);
             }
-
-            Program.totalActionsFinishedInstagram += 1;
-
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.Out.WriteLine("Tarefa finalizada com sucesso em: " + DateTime.Now);
-            Console.WriteLine("\n");
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.Out.WriteLine("Tarefas de Like realizadas: " + Program.totalActionsLikeFinishedInstagram);
-            Console.Out.WriteLine("Tarefas de Follow realizadas: " + Program.totalActionsFollowFinishedInstagram);
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.Out.WriteLine("Total de tarefas realizadas nesse processo: " + Program.totalActionsFinishedInstagram);
-            Console.WriteLine("\n\n");
         }
     }
 }

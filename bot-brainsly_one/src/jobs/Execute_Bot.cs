@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Quartz;
 using Quartz.Impl;
 using bot_brainsly_one.src.tasks;
@@ -11,34 +7,41 @@ namespace bot_brainsly_one.src.jobs
 {
     public class Execute_Bot
     {
-        public async Task ExecuteBot()
+        public void ExecuteBot()
         {
-            // Grab the Scheduler instance from the Factory
-            StdSchedulerFactory factory = new StdSchedulerFactory();
-            IScheduler scheduler = await factory.GetScheduler();
+            try
+            {
+                // Grab the Scheduler instance from the Factory
+                StdSchedulerFactory factory = new StdSchedulerFactory();
+                IScheduler scheduler = factory.GetScheduler().ConfigureAwait(false).GetAwaiter().GetResult();
 
-            // and start it off
-            await scheduler.Start();
+                // and start it off
+                scheduler.Start().ConfigureAwait(false).GetAwaiter().GetResult();
 
-            // define the job and tie it to our HelloJob class
-            IJobDetail job = JobBuilder.Create<Task_Instagram>()
-                .WithIdentity("job1", "group1")
-                .Build();
+                // define the job and tie it to our HelloJob class
+                IJobDetail job = JobBuilder.Create<Task_Actions>()
+                    .WithIdentity("job1", "group1")
+                    .Build();
 
-            // Trigger the job to run now, and then repeat every 3 seconds
-            ITrigger trigger = TriggerBuilder.Create()
-                .WithIdentity("trigger1", "group1")
-                .StartNow()
-                .WithSimpleSchedule(x => x
-                    .WithIntervalInSeconds(2)
-                    .RepeatForever())
-                .Build();
+                // Trigger the job to run now, and then repeat every 6 seconds
+                ITrigger trigger = TriggerBuilder.Create()
+                    .WithIdentity("trigger1", "group1")
+                    .StartNow()
+                    .WithSimpleSchedule(x => x
+                        .WithIntervalInMinutes(190)
+                        .RepeatForever())
+                    .Build();
 
-            // Tell quartz to schedule the job using our trigger
-            await scheduler.ScheduleJob(job, trigger);
+                // Tell quartz to schedule the job using our trigger
+                scheduler.ScheduleJob(job, trigger).ConfigureAwait(false).GetAwaiter().GetResult();
 
-            // some sleep to show what's happening
-            await Task.Delay(TimeSpan.FromSeconds(60000));
+                Console.ReadKey();
+            }
+            catch (Exception error)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Out.WriteLine(error.Message);
+            }
         }
     }
 }
