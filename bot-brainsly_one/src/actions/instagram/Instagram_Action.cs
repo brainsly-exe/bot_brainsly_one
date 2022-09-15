@@ -13,7 +13,7 @@ namespace bot_brainsly_one.src.actions.instagram
         {
             try
             {
-                var StopTime = DateTime.Now.AddHours(3);
+                var StopTime = DateTime.Now.AddHours(2);
                 do
                 {
                     Thread.Sleep(2000);
@@ -126,7 +126,7 @@ namespace bot_brainsly_one.src.actions.instagram
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine(error.Message);
+                Console.Out.WriteLine($"Browser travou com o erro: {error.Message} as {DateTime.Now}");
             }
         }
 
@@ -136,6 +136,13 @@ namespace bot_brainsly_one.src.actions.instagram
             {
                 IWebElement buttonLike = null;
                 if (driver.TryFindElement(By.XPath("//*[@aria-label='Curtir'][name()='svg']/parent::div/parent::button"), out buttonLike))
+                {
+                    buttonLike.Click();
+                    Thread.Sleep(8000);
+                    driver.Close();
+                    return true;
+                }
+                else if(driver.TryFindElement(By.XPath("//*[@aria-label='Gosto'][name()='svg']/parent::div/parent::button/parent::span/child::button"), out buttonLike))
                 {
                     buttonLike.Click();
                     Thread.Sleep(8000);
@@ -152,7 +159,7 @@ namespace bot_brainsly_one.src.actions.instagram
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine(error.Message);
+                Console.Out.WriteLine($"cccccccccccccccccc{error.Message}");
                 return false;
             }
         }
@@ -178,7 +185,7 @@ namespace bot_brainsly_one.src.actions.instagram
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine(error.Message);
+                Console.Out.WriteLine($"ddddddddddddddddddddd{error.Message}");
                 return false;
             }
         }
@@ -207,7 +214,7 @@ namespace bot_brainsly_one.src.actions.instagram
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine(error.Message);
+                Console.Out.WriteLine($"eeeeeeeeeeeeeeeeeeeeee{error.Message}");
                 return false;
             }
         }
@@ -236,7 +243,7 @@ namespace bot_brainsly_one.src.actions.instagram
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine(error.Message);
+                Console.Out.WriteLine($"fffffffffffffffffffff{error.Message}");
             }
         }
     }

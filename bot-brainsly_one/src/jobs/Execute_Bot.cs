@@ -27,9 +27,7 @@ namespace bot_brainsly_one.src.jobs
                 ITrigger trigger = TriggerBuilder.Create()
                     .WithIdentity("trigger1", "group1")
                     .StartNow()
-                    .WithSimpleSchedule(x => x
-                        .WithIntervalInMinutes(190)
-                        .RepeatForever())
+                    .WithSimpleSchedule(x => x.RepeatForever())
                     .Build();
 
                 // Tell quartz to schedule the job using our trigger
@@ -40,7 +38,7 @@ namespace bot_brainsly_one.src.jobs
             catch (Exception error)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Out.WriteLine(error.Message);
+                Console.Out.WriteLine($"hhhhhhhhhhhhhhh{error.Message}");
             }
         }
     }

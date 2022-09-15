@@ -5,8 +5,7 @@ namespace bot_brainsly_one
 {
     public class Program
     {
-        public static string botName;
-        public static string accountInstagram;
+        public static string accountInstagram; 
 
         public static int totalActionsFinished = 0;
         public static int totalActionsLikeFinished = 0;
@@ -14,14 +13,12 @@ namespace bot_brainsly_one
 
         public static void Main(string[] args)
         {
-            Console.Out.Write("Insira qual bot deseja startar: ");
-            Program.botName = Console.ReadLine();
             Console.Out.Write("Insira qual conta do Instagram deseja usar: ");
             Program.accountInstagram = Console.ReadLine();
-
-            Console.Title = $"Brainsly_{Program.accountInstagram} - GanharNoInsta {Program.botName}";
+          
+            Console.Title = $"Brainsly_{Program.accountInstagram}";
             Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine($"-- Iniciado o BOT BRAINSLY_{Program.botName.ToUpper()}, na conta brainsly_{Program.accountInstagram.ToLower()} --");
+            Console.WriteLine($"-- Iniciado o BOT Brainsly_{Program.accountInstagram} --");
             Console.WriteLine("\n\n\n");
             Console.ForegroundColor = ConsoleColor.White;
 
