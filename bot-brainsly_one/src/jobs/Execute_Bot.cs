@@ -27,7 +27,7 @@ namespace bot_brainsly_one.src.jobs
                 ITrigger trigger = TriggerBuilder.Create()
                     .WithIdentity("trigger1", "group1")
                     .StartNow()
-                    .WithSimpleSchedule(x => x.RepeatForever())
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
                     .Build();
 
                 // Tell quartz to schedule the job using our trigger
