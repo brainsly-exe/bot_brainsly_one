@@ -127,6 +127,7 @@ namespace bot_brainsly_one.src.actions.instagram
             catch (Exception error)
             {
                 Console.Out.WriteLine($"Browser travou com o erro: {error.Message} as {DateTime.Now}");
+                throw error;
             }
         }
 
