@@ -38,29 +38,36 @@ namespace bot_brainsly_one.src.tasks
 
         private void StartWebDriver()
         {
-            string correctProfile = this.ChooseChromeProfile();
+            try
+            {
+                string correctProfile = this.ChooseChromeProfile();
 
-            ChromeOptions options = new ChromeOptions();
-            options.AddArgument("--disable-dev-shm-usage");
-            options.AddArgument("--disable-browser-side-navigation");
-            //options.AddArgument("--headless");
-            //options.AddArgument("--no-sandbox");
-            //options.AddArgument("--disable-gpu");
-            options.AddArgument("--start-maximized");
-            options.AddArgument("--window-size=1920,1080");
-            options.AddArgument("--hide-scrollbars");
-            options.AddArgument("--v=99");
-            options.AddArgument("--single-process");
-            options.AddArgument("--data-path=/tmp/data-path");
-            options.AddArgument("--ignore-certificate-errors");
-            options.AddArgument("--homedir=/tmp");
-            options.AddArgument("--disk-cache-dir=/tmp/cache-dir");
-            options.AddArgument($"user-data-dir=C:\\Users\\Pedro\\projects\\.net\\bot-brainsly_one\\profiles\\{Program.accountInstagram}\\User Data");
-            options.AddArgument($"profile-directory={correctProfile}");
-            options.AddArgument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36");
-            options.AddExcludedArguments("enable-automation", "enable-logging");
+                ChromeOptions options = new ChromeOptions();
+                options.AddArgument("--disable-dev-shm-usage");
+                options.AddArgument("--disable-browser-side-navigation");
+                //options.AddArgument("--headless");
+                //options.AddArgument("--no-sandbox");
+                //options.AddArgument("--disable-gpu");
+                options.AddArgument("--start-maximized");
+                options.AddArgument("--window-size=1920,1080");
+                options.AddArgument("--hide-scrollbars");
+                options.AddArgument("--v=99");
+                options.AddArgument("--single-process");
+                options.AddArgument("--data-path=/tmp/data-path");
+                options.AddArgument("--ignore-certificate-errors");
+                options.AddArgument("--homedir=/tmp");
+                options.AddArgument("--disk-cache-dir=/tmp/cache-dir");
+                options.AddArgument($"user-data-dir=C:\\Users\\Pedro\\projects\\.net\\bot-brainsly_one\\profiles\\{Program.accountInstagram}\\User Data");
+                options.AddArgument($"profile-directory={correctProfile}");
+                options.AddArgument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36");
+                options.AddExcludedArguments("enable-automation", "enable-logging");
 
-            this.driver = new ChromeDriver(options);
+                this.driver = new ChromeDriver(options);
+            }
+            catch (Exception error)
+            {
+                throw error;
+            }
         }
 
         private string ChooseChromeProfile()
