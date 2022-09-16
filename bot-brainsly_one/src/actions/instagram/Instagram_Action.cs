@@ -140,15 +140,45 @@ namespace bot_brainsly_one.src.actions.instagram
                 {
                     buttonLike.Click();
                     Thread.Sleep(8000);
-                    driver.Close();
-                    return true;
+
+                    IWebElement bodyTag = null;
+                    if (driver.TryFindElement(By.TagName("body"), out bodyTag))
+                    {
+                       if(bodyTag?.Text.Contains("A tua conta foi bloqueada temporariamente e não pode efetuar esta ação") == true)
+                       {
+                            driver.Quit();
+                            Environment.Exit(0);
+                       }
+                       else
+                       {
+                            driver.Close();
+                            return true;
+                       }
+                    }
+
+                    return false;
                 }
                 else if(driver.TryFindElement(By.XPath("//*[@aria-label='Gosto'][name()='svg']/parent::div/parent::button/parent::span/child::button"), out buttonLike))
                 {
                     buttonLike.Click();
                     Thread.Sleep(8000);
-                    driver.Close();
-                    return true;
+
+                    IWebElement bodyTag = null;
+                    if (driver.TryFindElement(By.TagName("body"), out bodyTag))
+                    {
+                        if (bodyTag?.Text.Contains("A tua conta foi bloqueada temporariamente e não pode efetuar esta ação") == true)
+                        {
+                            driver.Quit();
+                            Environment.Exit(0);
+                        }
+                        else
+                        {
+                            driver.Close();
+                            return true;
+                        }
+                    }
+
+                    return false;
                 }
                 else
                 {
@@ -174,8 +204,23 @@ namespace bot_brainsly_one.src.actions.instagram
                 {
                     buttonFollow.Click();
                     Thread.Sleep(8000);
-                    driver.Close();
-                    return true;
+
+                    IWebElement bodyTag = null;
+                    if (driver.TryFindElement(By.TagName("body"), out bodyTag))
+                    {
+                        if (bodyTag?.Text.Contains("A tua conta foi bloqueada temporariamente e não pode efetuar esta ação") == true)
+                        {
+                            driver.Quit();
+                            Environment.Exit(0);
+                        }
+                        else
+                        {
+                            driver.Close();
+                            return true;
+                        }
+                    }
+
+                    return false;
                 }
                 else
                 {
