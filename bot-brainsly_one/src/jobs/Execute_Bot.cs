@@ -23,12 +23,35 @@ namespace bot_brainsly_one.src.jobs
                     .WithIdentity("job1", "group1")
                     .Build();
 
-                // Trigger the job to run now, and then repeat every 6 seconds
-                ITrigger trigger = TriggerBuilder.Create()
-                    .WithIdentity("trigger1", "group1")
-                    .StartNow()
-                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
-                    .Build();
+                ITrigger trigger;
+
+                if (Program.accountInstagramGroup1.Contains(Program.accountInstagram))
+                {
+                    trigger = TriggerBuilder.Create()
+                    .WithIdentity("trigger3", "group1")
+                    .StartAt(DateBuilder.TodayAt(4, 10, 0))
+                    .WithSimpleSchedule(x =>
+                            x.WithIntervalInHours(2 * 24)
+                            .RepeatForever()
+                    ).Build();
+                }
+                else
+                {
+                    trigger = TriggerBuilder.Create()
+                    .WithIdentity("trigger3", "group1")
+                    .StartAt(DateBuilder.TomorrowAt(4, 15, 0))
+                    .WithSimpleSchedule(x =>
+                            x.WithIntervalInHours(2 * 24)
+                            .RepeatForever()
+                    ).Build();
+                }
+
+                // DESATIVADO
+                //ITrigger trigger = TriggerBuilder.Create()
+                //    .WithIdentity("trigger1", "group1")
+                //    .StartNow()
+                //    .WithSimpleSchedule(x => x.WithIntervalInSeconds(1).RepeatForever())
+                //    .Build();
 
                 // Tell quartz to schedule the job using our trigger
                 scheduler.ScheduleJob(job, trigger).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -38,7 +61,7 @@ namespace bot_brainsly_one.src.jobs
             catch (Exception error)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Out.WriteLine($"hhhhhhhhhhhhhhh{error.Message}");
+                Console.Out.WriteLine($"Error: {error.Message}");
             }
         }
     }

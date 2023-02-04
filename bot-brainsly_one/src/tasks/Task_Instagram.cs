@@ -7,6 +7,10 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using bot_brainsly_one.src.utils;
 using OpenQA.Selenium.Support.UI;
+using System.IO;
+using System.Linq;
+using System.Data;
+using System.Web.UI.WebControls;
 
 namespace bot_brainsly_one.src.tasks
 {
@@ -20,17 +24,21 @@ namespace bot_brainsly_one.src.tasks
         {
             try
             {
-                this.StartWebDriver();
-                this.StartProcess();
-                
-                new Actions().MakeActions(this.driver);
-                this.driver.Quit();
-               
+                var StopTime = DateTime.Now.AddHours(20);
+                do
+                {
+                    this.StartWebDriver();
+                    this.StartProcess();
+
+                    new Actions().MakeActions(this.driver);
+                    this.driver.Quit();
+                } while (DateTime.Now <= StopTime);
+
                 return Task.CompletedTask;
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine($"aaaaaaaaaaaaaaaaaaa{ error.Message}");
+                Console.Out.WriteLine($"Error: { error.Message}");
                 this.driver.Quit();
                 return Task.CompletedTask;
             }
@@ -57,7 +65,7 @@ namespace bot_brainsly_one.src.tasks
                 options.AddArgument("--ignore-certificate-errors");
                 options.AddArgument("--homedir=/tmp");
                 options.AddArgument("--disk-cache-dir=/tmp/cache-dir");
-                options.AddArgument($"user-data-dir=C:\\Users\\Pedro\\projects\\.net\\bot-brainsly_one\\profiles\\{Program.accountInstagram}\\User Data");
+                options.AddArgument($"user-data-dir={new FileUtils().BaseProjectDirectory}\\profiles\\{Program.accountInstagram}\\User Data");
                 options.AddArgument($"profile-directory={correctProfile}");
                 options.AddArgument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36");
                 options.AddExcludedArguments("enable-automation", "enable-logging");
@@ -138,6 +146,40 @@ namespace bot_brainsly_one.src.tasks
                 }
             }
             return true;
+        }
+
+        private void UpdateDailyReport(string actionType)
+        {
+            try
+            {
+                if (actionType == "follow") Program.totalActionsFollowFinished += 1;
+                else Program.totalActionsLikeFinished += 1;
+
+                Program.totalActionsFinished += 1;
+
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Out.WriteLine("Tarefa finalizada com sucesso em: " + DateTime.Now);
+                Console.WriteLine("\n");
+
+                Console.Out.WriteLine("Resumo de Tarefas");
+                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                Console.Out.WriteLine("Tarefas de Like realizadas: " + Program.totalActionsLikeFinished);
+                Console.Out.WriteLine("Tarefas de Follow realizadas: " + Program.totalActionsFollowFinished);
+                Console.WriteLine("\n");
+
+                Console.Out.WriteLine("Total de tarefas realizadas nesse processo: " + Program.totalActionsFinished);
+                Console.WriteLine("\n\n");
+
+                DataSet dataSet = new DataSet(Program.accountInstagram);
+
+                dataSet.Tables.Clear();
+
+                new ReportUtils().ExportDataSet(dataSet);
+            }
+            catch (Exception error)
+            {
+                throw error;
+            }
         }
     }
 }

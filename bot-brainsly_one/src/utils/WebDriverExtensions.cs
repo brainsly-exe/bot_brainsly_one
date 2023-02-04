@@ -2,7 +2,7 @@
 
 namespace bot_brainsly_one.src.utils
 {
-    public static class WebDriverExtensions
+    public static class WebDriverExtensionsUtils
     {
         public static bool TryFindElement(this IWebDriver driver, By by, out IWebElement element)
         {

@@ -4,6 +4,7 @@ using System.Threading;
 using bot_brainsly_one.src.utils;
 using System.Linq;
 using OpenQA.Selenium.Support.UI;
+using System.Data;
 
 namespace bot_brainsly_one.src.actions.instagram
 {
@@ -78,7 +79,7 @@ namespace bot_brainsly_one.src.actions.instagram
                             {
                                 driver.Navigate().Refresh();
                                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                                Console.Out.WriteLine("Ocorreu um erro, sistema reiniciado em: " + DateTime.Now + "\n");
+                                Console.Out.WriteLine("Ocorreu um erro na plataforma, processo reiniciado em: " + DateTime.Now + "\n");
                                 continue;
                             }
                         }
@@ -110,8 +111,8 @@ namespace bot_brainsly_one.src.actions.instagram
 
                             buttonAccessAction.Click();
                             Thread.Sleep(5000);
-                            Console.ForegroundColor = ConsoleColor.Gray;
-                            Console.WriteLine("Tarefa de " + type + " recebida em " + DateTime.Now);
+                            //Console.ForegroundColor = ConsoleColor.Gray;
+                            //Console.WriteLine("Tarefa de " + type + " recebida em " + DateTime.Now);
 
                             driver.SwitchTo().Window(driver.WindowHandles.Last());
                             Thread.Sleep(9000);
@@ -126,7 +127,6 @@ namespace bot_brainsly_one.src.actions.instagram
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine($"Browser travou com o erro: {error.Message} as {DateTime.Now}");
                 throw error;
             }
         }
@@ -190,8 +190,7 @@ namespace bot_brainsly_one.src.actions.instagram
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine($"cccccccccccccccccc{error.Message}");
-                return false;
+                throw error;
             }
         }
 
@@ -231,8 +230,7 @@ namespace bot_brainsly_one.src.actions.instagram
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine($"ddddddddddddddddddddd{error.Message}");
-                return false;
+                throw error;
             }
         }
         
@@ -249,7 +247,7 @@ namespace bot_brainsly_one.src.actions.instagram
                 {
                     buttonConfirm.Click();
                     Thread.Sleep(4000);
-                    this.LogInfos(actionType);
+                    this.UpdateProcessStatus(actionType);
 
                     return true;
                 }
@@ -260,36 +258,51 @@ namespace bot_brainsly_one.src.actions.instagram
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine($"eeeeeeeeeeeeeeeeeeeeee{error.Message}");
-                return false;
+                throw error;
             }
         }
 
-        private void LogInfos(string actionType)
+        private void UpdateProcessStatus(string actionType)
         {
             try
             {
-                if (actionType == "follow") Program.totalActionsFollowFinished += 1;
-                else Program.totalActionsLikeFinished += 1;
+                if (actionType == "follow")
+                {
+                    Program.totalActionsFollowFinished += 1;
+                }
+                else
+                {
+                    Program.totalActionsLikeFinished += 1;
+                }
 
                 Program.totalActionsFinished += 1;
 
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Out.WriteLine("Tarefa finalizada com sucesso em: " + DateTime.Now);
-                Console.WriteLine("\n");
+                DataSet dataSet = new DataSet();
+                dataSet.Tables.Add("report");
+                dataSet.Tables["report"].Columns.Add("A");
+                dataSet.Tables["report"].Columns.Add("B");
+                dataSet.Tables["report"].Columns.Add("C");
+                dataSet.Tables["report"].Columns.Add("D");
+                dataSet.Tables["report"].Columns.Add("E");
+                dataSet.Tables["report"].Columns.Add("F");
 
-                Console.Out.WriteLine("Resumo de Tarefas");
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Out.WriteLine("Tarefas de Like realizadas: " + Program.totalActionsLikeFinished);
-                Console.Out.WriteLine("Tarefas de Follow realizadas: " + Program.totalActionsFollowFinished);
-                Console.WriteLine("\n");
+                dataSet.Tables["report"].Columns["F"].DataType = typeof(Double);
+                dataSet.Tables["report"].Rows.Add();
 
-                Console.Out.WriteLine("Total de tarefas realizadas nesse processo: " + Program.totalActionsFinished);
-                Console.WriteLine("\n\n");
+                dataSet.Tables["report"].Rows[0]["A"] = "Instagram";
+                dataSet.Tables["report"].Rows[0]["B"] = Program.totalActionsLikeFinished;
+                dataSet.Tables["report"].Rows[0]["C"] = Program.totalActionsFollowFinished;
+                dataSet.Tables["report"].Rows[0]["D"] = Program.totalActionsFinished;
+                dataSet.Tables["report"].Rows[0]["E"] = DateTime.Now.ToString("dd/MM/yyyy");
+                dataSet.Tables["report"].Rows[0]["F"] = (Program.totalActionsLikeFinished * 0.002) + (Program.totalActionsFollowFinished * 0.004);
+                //0,002 = like
+                //0,004 = follow
+
+                new ReportUtils().ExportDataSet(dataSet);
             }
             catch (Exception error)
             {
-                Console.Out.WriteLine($"fffffffffffffffffffff{error.Message}");
+                throw error;
             }
         }
     }
