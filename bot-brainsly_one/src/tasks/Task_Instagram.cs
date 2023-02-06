@@ -22,9 +22,10 @@ namespace bot_brainsly_one.src.tasks
 
         public Task Execute(IJobExecutionContext context)
         {
+            var StopTime = DateTime.Now.AddHours(Program.auxActualRemainingProcessHours);
+
             try
             {
-                var StopTime = DateTime.Now.AddHours(20);
                 do
                 {
                     this.StartWebDriver();
@@ -32,15 +33,21 @@ namespace bot_brainsly_one.src.tasks
 
                     new Actions().MakeActions(this.driver);
                     this.driver.Quit();
+                    this.isLogged = false;
                 } while (DateTime.Now <= StopTime);
 
+                Program.auxActualRemainingProcessHours = 20;
                 return Task.CompletedTask;
             }
             catch (Exception error)
             {
                 Console.Out.WriteLine($"Error: { error.Message}");
                 this.driver.Quit();
-                return Task.CompletedTask;
+                this.isLogged = false;
+
+                Program.auxActualRemainingProcessHours = (Program.auxActualRemainingProcessHours - StopTime.Hour);
+
+                return Execute(context);
             }
         }
 

@@ -29,7 +29,7 @@ namespace bot_brainsly_one.src.jobs
                 {
                     trigger = TriggerBuilder.Create()
                     .WithIdentity("trigger3", "group1")
-                    .StartAt(DateBuilder.TodayAt(4, 10, 0))
+                    .StartAt(DateBuilder.TodayAt(17, 40, 0))
                     .WithSimpleSchedule(x =>
                             x.WithIntervalInHours(2 * 24)
                             .RepeatForever()
@@ -39,7 +39,7 @@ namespace bot_brainsly_one.src.jobs
                 {
                     trigger = TriggerBuilder.Create()
                     .WithIdentity("trigger3", "group1")
-                    .StartAt(DateBuilder.TomorrowAt(4, 15, 0))
+                    .StartAt(DateBuilder.TomorrowAt(17, 45, 0))
                     .WithSimpleSchedule(x =>
                             x.WithIntervalInHours(2 * 24)
                             .RepeatForever()

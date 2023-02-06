@@ -15,6 +15,8 @@ namespace bot_brainsly_one
         public static int totalActionsLikeFinished = 0;
         public static int totalActionsFollowFinished = 0;
 
+        public static int auxActualRemainingProcessHours = 20;
+
         public static void Main(string[] args)
         {
             Program.accountInstagram = args[0];
