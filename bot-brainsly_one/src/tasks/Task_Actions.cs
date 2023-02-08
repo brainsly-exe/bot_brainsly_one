@@ -11,6 +11,12 @@ using System.IO;
 using System.Linq;
 using System.Data;
 using System.Web.UI.WebControls;
+using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Drawing.Diagrams;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using bot_brainsly_one.src.DTO;
 
 namespace bot_brainsly_one.src.tasks
 {
@@ -45,7 +51,7 @@ namespace bot_brainsly_one.src.tasks
                 this.driver.Quit();
                 this.isLogged = false;
 
-                Program.auxActualRemainingProcessHours = (Program.auxActualRemainingProcessHours - StopTime.Hour);
+                Program.auxActualRemainingProcessHours = (StopTime.Subtract(DateTime.Now).Hours);
 
                 return Execute(context);
             }
@@ -87,31 +93,24 @@ namespace bot_brainsly_one.src.tasks
 
         private string ChooseChromeProfile()
         {
-            switch (Program.accountInstagram)
+            var userDataPath = $"{new FileUtils().BaseProjectDirectory}\\profiles\\{Program.accountInstagram}\\User Data";
+            var userDataFolders = new DirectoryInfo(userDataPath).GetDirectories("Profile*");
+
+            foreach (DirectoryInfo directory in userDataFolders)
             {
-                case "one":
-                    return "Profile 1";
-                case "three":
-                    return "Profile 2";
-                case "four":
-                    return "Profile 3";
-                case "five":
-                    return "Profile 4";
-                case "six":
-                    return "Profile 5";
-                case "fiveteen":
-                    return "Profile 6";
-                case "sixteen":
-                    return "Profile 7";
-                case "seventeen":
-                    return "Profile 8";
-                case "eighteen":
-                    return "Profile 9";
-                case "nineteen":
-                    return "Profile 10";
-                default:
-                    return "";
+                IEnumerable<FileInfo> fileList = directory.GetFiles("Preferences");
+
+                using (StreamReader file = File.OpenText(fileList.First().FullName))
+                using (JsonTextReader reader = new JsonTextReader(file))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    ChromeConfigFileDTO chromeConfig = serializer.Deserialize<ChromeConfigFileDTO>(reader);
+
+                    if (chromeConfig.profile.name == Program.accountInstagram) return directory.Name;
+                }
             }
+
+            throw new Exception("Profile não localizado para o bot.");
         }
 
         private void StartProcess()
@@ -153,40 +152,6 @@ namespace bot_brainsly_one.src.tasks
                 }
             }
             return true;
-        }
-
-        private void UpdateDailyReport(string actionType)
-        {
-            try
-            {
-                if (actionType == "follow") Program.totalActionsFollowFinished += 1;
-                else Program.totalActionsLikeFinished += 1;
-
-                Program.totalActionsFinished += 1;
-
-                Console.ForegroundColor = ConsoleColor.Gray;
-                Console.Out.WriteLine("Tarefa finalizada com sucesso em: " + DateTime.Now);
-                Console.WriteLine("\n");
-
-                Console.Out.WriteLine("Resumo de Tarefas");
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.Out.WriteLine("Tarefas de Like realizadas: " + Program.totalActionsLikeFinished);
-                Console.Out.WriteLine("Tarefas de Follow realizadas: " + Program.totalActionsFollowFinished);
-                Console.WriteLine("\n");
-
-                Console.Out.WriteLine("Total de tarefas realizadas nesse processo: " + Program.totalActionsFinished);
-                Console.WriteLine("\n\n");
-
-                DataSet dataSet = new DataSet(Program.accountInstagram);
-
-                dataSet.Tables.Clear();
-
-                new ReportUtils().ExportDataSet(dataSet);
-            }
-            catch (Exception error)
-            {
-                throw error;
-            }
         }
     }
 }

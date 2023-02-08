@@ -124,11 +124,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\actions\instagram\Instagram_Action.cs" />
+    <Compile Include="src\DTO\ChromeConfigFileDTO.cs" />
     <Compile Include="src\jobs\Execute_Bot.cs" />
     <Compile Include="src\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src\settings\bot.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>bot.settings</DependentUpon>
+    </Compile>
     <Compile Include="src\tasks\JobFailureHandler.cs" />
-    <Compile Include="src\tasks\Task_Instagram.cs" />
+    <Compile Include="src\tasks\Task_Actions.cs" />
     <Compile Include="src\utils\FileUtils.cs" />
     <Compile Include="src\utils\ReportUtils.cs" />
     <Compile Include="src\utils\WebDriverExtensions.cs" />
@@ -136,6 +142,10 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="src\settings\bot.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>bot.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
