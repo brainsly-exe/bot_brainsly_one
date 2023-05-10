@@ -1,3 +1,3 @@
 # bot_brainsly_one
 
-Em construção... <3
+v2 in progressing in another private repository... <3
